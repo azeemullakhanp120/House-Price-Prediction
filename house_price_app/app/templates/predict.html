@@ -1,0 +1,143 @@
+{% extends 'base.html' %}
+
+{% block title %}House Price Prediction — {{ current_city.name }}{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-9">
+
+            <!-- Page header card -->
+            <div class="card card-glass p-4 mb-4 border-0">
+                <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="rounded-circle bg-primary text-white p-3 d-flex align-items-center justify-content-center"
+                             style="width:56px;height:56px;font-size:1.5rem;">
+                            <i class="fa-solid fa-calculator"></i>
+                        </div>
+                        <div>
+                            <h2 class="fw-bold mb-1">{{ current_city.name }} House Price Prediction</h2>
+                            <p class="text-muted mb-0">
+                                Get an instant ML valuation with a 95% confidence range calibrated for {{ current_city.name }}.
+                            </p>
+                        </div>
+                    </div>
+                    <div class="badge bg-light text-primary border px-3 py-2 rounded-pill fs-6">
+                        <i class="fa-solid fa-city me-1"></i> {{ current_city.name }} ({{ current_city.short_code }})
+                    </div>
+                </div>
+            </div>
+
+            <!-- Prediction Form -->
+            <div class="card card-glass p-4 shadow-sm border-0">
+                <form action="{{ url_for('predict') }}" method="POST" id="predictForm">
+                    <div class="row g-3">
+
+                        <!-- City Selector Dropdown in Form -->
+                        <div class="col-md-6">
+                            <label for="form_city_select" class="form-label">
+                                <i class="fa-solid fa-city text-primary me-1"></i>
+                                Selected City
+                            </label>
+                            <select class="form-select" id="form_city_select" name="city">
+                                {% for c in cities %}
+                                    <option value="{{ c.name }}" {% if c.name == active_city_name %}selected{% endif %}>
+                                        {{ c.name }} ({{ c.short_code }})
+                                    </option>
+                                {% endfor %}
+                            </select>
+                            <div class="form-text text-muted">
+                                Switching city will dynamically reload the localities below.
+                            </div>
+                        </div>
+
+                        <!-- Locality Dropdown -->
+                        <div class="col-md-6">
+                            <label for="location" class="form-label">
+                                <i class="fa-solid fa-location-dot text-danger me-1"></i>
+                                Locality / Neighborhood
+                            </label>
+                            <select class="form-select" id="location" name="location" required>
+                                <option value="" disabled selected>Select {{ current_city.name }} area…</option>
+                                {% for loc in locations %}
+                                    <option value="{{ loc }}">{{ loc }}</option>
+                                {% endfor %}
+                            </select>
+                            <div class="form-text text-muted">
+                                Localities available in the {{ current_city.name }} dataset.
+                            </div>
+                        </div>
+
+                        <!-- Built-up Area (total_sqft) -->
+                        <div class="col-md-6">
+                            <label for="total_sqft" class="form-label">
+                                <i class="fa-solid fa-vector-square text-primary me-1"></i>
+                                Built-up Area (sqft)
+                            </label>
+                            <input type="number" class="form-control"
+                                   id="total_sqft" name="total_sqft"
+                                   min="300" max="30000" step="1"
+                                   placeholder="e.g. 1450" required>
+                        </div>
+
+                        <!-- BHK -->
+                        <div class="col-md-3">
+                            <label for="BHK" class="form-label">
+                                <i class="fa-solid fa-bed text-primary me-1"></i>
+                                Bedrooms (BHK)
+                            </label>
+                            <select class="form-select" id="BHK" name="BHK" required>
+                                <option value="1">1 BHK</option>
+                                <option value="2" selected>2 BHK</option>
+                                <option value="3">3 BHK</option>
+                                <option value="4">4 BHK</option>
+                                <option value="5">5 BHK</option>
+                                <option value="6">6 BHK</option>
+                            </select>
+                        </div>
+
+                        <!-- Bathrooms -->
+                        <div class="col-md-3">
+                            <label for="bath" class="form-label">
+                                <i class="fa-solid fa-bath text-primary me-1"></i>
+                                Bathrooms
+                            </label>
+                            <select class="form-select" id="bath" name="bath" required>
+                                <option value="1">1 Bath</option>
+                                <option value="2" selected>2 Baths</option>
+                                <option value="3">3 Baths</option>
+                                <option value="4">4 Baths</option>
+                                <option value="5">5+ Baths</option>
+                            </select>
+                        </div>
+
+                        <!-- Submit Button -->
+                        <div class="col-12 mt-4">
+                            <button type="submit" class="btn btn-primary-gradient btn-lg w-100 py-3">
+                                <i class="fa-solid fa-bolt me-2"></i> Estimate Market Value
+                            </button>
+                        </div>
+
+                    </div>
+                </form>
+            </div>
+
+            <!-- Info card -->
+            <div class="card card-glass p-3 mt-4 border-0">
+                <div class="d-flex align-items-center gap-3">
+                    <i class="fa-solid fa-circle-info text-primary fs-3"></i>
+                    <div>
+                        <p class="text-dark small mb-1 fw-semibold">
+                            Note: Prices are estimated listing prices from historical real estate data for <strong>{{ current_city.name }}</strong>.
+                        </p>
+                        <p class="text-muted small mb-0">
+                            Predictions are calculated using machine learning regression pipelines trained on thousands of verified metropolitan listings.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+{% endblock %}

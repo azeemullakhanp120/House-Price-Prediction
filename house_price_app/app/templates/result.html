@@ -1,0 +1,134 @@
+{% extends 'base.html' %}
+
+{% block title %}Valuation Result — {{ city }} House Price Prediction{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+
+            <!-- Price banner -->
+            <div class="card price-display-card mb-4">
+                <span class="badge bg-white text-primary px-3 py-2 rounded-pill fw-bold text-uppercase mx-auto mb-2"
+                    style="width:fit-content;">
+                    <i class="fa-solid fa-circle-check me-1 text-success"></i>
+                    ML Estimated Market Value — {{ city }}
+                </span>
+                <div class="price-main mb-1">{{ formatted_price }}</div>
+                <p class="mb-3 opacity-75 fs-5">Equivalent to ₹{{ price_lakhs }} Lakhs INR</p>
+                <div
+                    class="d-inline-flex align-items-center gap-2 bg-white bg-opacity-20 px-4 py-2 rounded-pill mx-auto">
+                    <i class="fa-solid fa-chart-line text-warning"></i>
+                    <span>95% Confidence Range: <strong>₹{{ confidence_low }}L – ₹{{ confidence_high }}L</strong></span>
+                </div>
+            </div>
+
+            <!-- Input summary + insights -->
+            <div class="row g-4 mb-4">
+
+                <!-- Evaluated Property Specs -->
+                <div class="col-md-6">
+                    <div class="card card-glass p-4 h-100 border-0">
+                        <h4 class="fw-bold text-dark mb-3 border-bottom pb-2">
+                            <i class="fa-solid fa-list-check text-primary me-2"></i>
+                            Evaluated Property Specs
+                        </h4>
+                        <div class="row g-2">
+                            <div class="col-6">
+                                <strong>Location:</strong> {{ input_data.location }}
+                            </div>
+                            <div class="col-6">
+                                <strong>City:</strong> {{ city }}
+                            </div>
+                            <div class="col-6">
+                                <strong>Total Area:</strong> {{ input_data.total_sqft }} sqft
+                            </div>
+                            <div class="col-6">
+                                <strong>BHK:</strong> {{ input_data.BHK }}
+                            </div>
+                            <div class="col-6">
+                                <strong>Bathrooms:</strong> {{ input_data.bath }}
+                            </div>
+                            <div class="col-6">
+                                <strong>Avg Rate:</strong> ₹{{ (price_lakhs * 100000 / input_data.total_sqft)|round|int
+                                }}/sqft
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Valuation Insights -->
+                <div class="col-md-6">
+                    <div class="card card-glass p-4 h-100 border-0 d-flex flex-column justify-content-between">
+                        <div>
+                            <h4 class="fw-bold text-dark mb-3 border-bottom pb-2">
+                                <i class="fa-solid fa-lightbulb text-warning me-2"></i>
+                                Valuation Insights
+                            </h4>
+                            <p class="text-muted small mb-2">
+                                This valuation was calculated using machine learning models trained specifically for
+                                <strong>{{ city }}</strong>'s micro-market trends.
+                            </p>
+                            <p class="text-muted small mb-1">
+                                Estimated property rate: <strong>₹{{ (price_lakhs * 100000 /
+                                    input_data.total_sqft)|round|int }} per sqft</strong>
+                                in <strong>{{ input_data.location }}, {{ city }}</strong>.
+                            </p>
+                            <p class="text-secondary small mb-0 fst-italic">
+                                <i class="fa-solid fa-circle-info me-1 text-primary"></i>
+                                Note: Prices are estimated listing prices from historical real estate data.
+                            </p>
+                        </div>
+                        <div class="d-flex gap-2 mt-3">
+                            <a href="{{ url_for('predict', city=city) }}" class="btn btn-primary-gradient w-50">
+                                <i class="fa-solid fa-arrow-rotate-left me-1"></i> New Valuation
+                            </a>
+                            <a href="{{ url_for('recommend', city=city, location=input_data.location) }}"
+                                class="btn btn-accent-gradient w-50">
+                                <i class="fa-solid fa-wand-magic-sparkles me-1"></i> Find Deals
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Recommendations Section -->
+            {% if recommendations and recommendations|length > 0 %}
+            <div class="mb-4">
+                <h4 class="fw-bold text-dark mb-3">
+                    <i class="fa-solid fa-gem text-info me-2"></i>
+                    Similar Recommended Deals in {{ city }}
+                </h4>
+                <div class="row g-3">
+                    {% for rec in recommendations %}
+                    <div class="col-md-4">
+                        <div class="card card-glass p-3 h-100 border-0 shadow-sm">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span class="badge bg-light text-primary border">{{ rec.property_id }}</span>
+                                <span
+                                    class="badge {% if 'Great' in rec.value_tag %}badge-great-deal{% elif 'Fair' in rec.value_tag %}badge-fair-deal{% else %}badge-overpriced{% endif %}">
+                                    {{ rec.value_tag }}
+                                </span>
+                            </div>
+                            <h5 class="fw-bold text-primary mb-1">₹{{ rec.price }} Lakhs</h5>
+                            <p class="text-muted small mb-2">{{ rec.location }}, {{ city }}</p>
+                            <div class="small text-muted mb-3">
+                                <strong>{{ rec.BHK }} BHK</strong> &bull; {{ rec.bath }} Bath &bull; {{ rec.total_sqft
+                                }} sqft
+                            </div>
+                            <a href="{{ url_for('recommend', city=city, property_id=rec.property_id) }}"
+                                class="btn btn-sm btn-outline-primary mt-auto">
+                                View Similar
+                            </a>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+        </div>
+    </div>
+</div>
+{% endblock %}

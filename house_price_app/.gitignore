@@ -1,0 +1,32 @@
+# Python bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Environments
+env/
+venv/
+ENV/
+.venv
+
+# Large Raw Data Files (do not commit raw archives)
+data/raw/
+data/*.zip
+data/*.tar.gz
+data/chennai_raw.csv
+
+# SQLite databases & secrets
+data/*.db
+.env
+*.secret
+
+# Matplotlib cache
+.matplotlib/
+
+# IDE & OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+

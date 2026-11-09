@@ -1,0 +1,40 @@
+{
+  "overall": {
+    "baseline": {
+      "r2": 0.9064,
+      "mae": 23.3,
+      "rmse": 35.35
+    },
+    "random_forest": {
+      "r2": 0.9745,
+      "mae": 14.41,
+      "rmse": 18.43
+    }
+  },
+  "per_city": {
+    "Bengaluru": {
+      "samples": 320,
+      "r2": 0.8954,
+      "mae": 16.88,
+      "rmse": 20.8
+    },
+    "Mumbai": {
+      "samples": 320,
+      "r2": 0.9871,
+      "mae": 12.95,
+      "rmse": 18.08
+    },
+    "Hyderabad": {
+      "samples": 320,
+      "r2": 0.9397,
+      "mae": 14.09,
+      "rmse": 17.51
+    },
+    "Chennai": {
+      "samples": 320,
+      "r2": 0.9532,
+      "mae": 13.71,
+      "rmse": 17.1
+    }
+  }
+}

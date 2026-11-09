@@ -1,0 +1,5 @@
+user_id,name,email,preferred_city,preferred_location,max_budget_lakhs,min_bedrooms
+USR-101,Rahul Sharma,rahul@example.com,Bengaluru,Indiranagar,180.0,3
+USR-102,Priya Patel,priya@example.com,Mumbai,Powai,350.0,2
+USR-103,Amit Verma,amit@example.com,Delhi NCR,Gurgaon,200.0,3
+USR-104,Sneha Reddy,sneha@example.com,Hyderabad,Gachibowli,120.0,2

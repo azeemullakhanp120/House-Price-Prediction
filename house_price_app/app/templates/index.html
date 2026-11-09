@@ -1,0 +1,170 @@
+{% extends 'base.html' %}
+
+{% block title %}House Price Prediction — {{ current_city.name }}{% endblock %}
+
+{% block content %}
+<!-- ── Hero Section ───────────────────────────────────────────────────────── -->
+<section class="hero-section">
+    <div class="container text-center text-lg-start">
+        <div class="row align-items-center gy-4">
+
+            <!-- Left: headline + CTAs + City Switcher Pills -->
+            <div class="col-lg-7">
+                <div class="d-flex flex-wrap align-items-center gap-2 mb-3 justify-content-center justify-content-lg-start">
+                    <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-3 py-2 rounded-pill fw-semibold">
+                        <i class="fa-solid fa-sparkles me-1"></i>
+                        AI-Powered Real Estate Analytics · {{ current_city.name }}
+                    </span>
+                    <span class="badge bg-success-subtle text-success border border-success-subtle px-3 py-2 rounded-pill fw-semibold">
+                        <i class="fa-solid fa-circle-check me-1"></i>
+                        {{ current_city.state }}
+                    </span>
+                </div>
+
+                <h1 class="hero-title mb-3">
+                    Smart Valuation &amp; Property Recommendations
+                    <span class="text-primary">in {{ current_city.name }}</span>
+                </h1>
+                <p class="hero-subtitle mb-4">
+                    {{ current_city.description }} Estimate accurate market prices using trained ML regression models,
+                    discover underpriced deals, and get personalised property recommendations instantly.
+                </p>
+
+                <!-- Quick City Selector Pills -->
+                <div class="mb-4">
+                    <div class="small fw-bold text-muted mb-2 text-uppercase">Switch City:</div>
+                    <div class="d-flex flex-wrap gap-2 justify-content-center justify-content-lg-start">
+                        {% for c in cities %}
+                        <a href="{{ url_for('set_city', city_name=c.name) }}"
+                           class="btn btn-sm {% if c.name == active_city_name %}btn-primary fw-bold shadow-sm{% else %}btn-outline-secondary bg-white{% endif %} rounded-pill px-3 py-1 city-select-trigger"
+                           data-city="{{ c.name }}">
+                            <i class="fa-solid fa-location-dot me-1 {% if c.name == active_city_name %}text-white{% else %}text-primary{% endif %}"></i>
+                            {{ c.name }}
+                        </a>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div class="d-flex flex-wrap justify-content-center justify-content-lg-start gap-3">
+                    <a href="{{ url_for('predict', city=current_city.name) }}" class="btn btn-primary-gradient btn-lg">
+                        <i class="fa-solid fa-calculator me-2"></i> Predict {{ current_city.name }} Price
+                    </a>
+                    <a href="{{ url_for('recommend', city=current_city.name) }}" class="btn btn-accent-gradient btn-lg">
+                        <i class="fa-solid fa-wand-magic-sparkles me-2"></i> Find Best Deals
+                    </a>
+                </div>
+            </div>
+
+            <!-- Right: live stats card -->
+            <div class="col-lg-5 text-center">
+                <div class="card card-glass p-4 text-dark shadow-sm">
+                    <div class="d-flex align-items-center justify-content-between mb-3 border-bottom pb-2">
+                        <span class="fw-bold text-primary">
+                            <i class="fa-solid fa-chart-line me-2"></i>{{ current_city.name }} Market Stats
+                        </span>
+                        <span class="badge bg-primary">{{ current_city.short_code }}</span>
+                    </div>
+                    <div class="row g-3">
+                        <div class="col-6">
+                            <div class="stat-card">
+                                <div class="stat-num">{{ total_properties }}+</div>
+                                <div class="stat-label">Properties Indexed</div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="stat-card">
+                                <div class="stat-num">~95%</div>
+                                <div class="stat-label">Model Accuracy</div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="stat-card">
+                                <div class="stat-num">{{ locations_count }}+</div>
+                                <div class="stat-label">Localities in {{ current_city.short_code }}</div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="stat-card">
+                                <div class="stat-num">4</div>
+                                <div class="stat-label">Supported Cities</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+<!-- ── Feature Cards ─────────────────────────────────────────────────────── -->
+<div class="container mb-5">
+    <div class="text-center mb-5">
+        <h2 class="fw-bold text-dark mb-2">Key System Features</h2>
+        <p class="text-muted">
+            Combining machine learning regression pipelines with
+            content-based cosine similarity filtering across India's top metropolitan areas.
+        </p>
+    </div>
+
+    <div class="row g-4">
+
+        <!-- Feature 1: Price Prediction -->
+        <div class="col-md-4">
+            <div class="card card-glass h-100 p-4 border-0">
+                <div class="rounded-circle bg-primary bg-opacity-10 text-primary d-inline-flex align-items-center justify-content-center mb-3"
+                     style="width:54px;height:54px;font-size:1.5rem;">
+                    <i class="fa-solid fa-brain"></i>
+                </div>
+                <h4 class="fw-bold text-dark">Price Valuation Model</h4>
+                <p class="text-muted">
+                    Trained on real data for <strong>{{ current_city.name }}</strong> using
+                    <strong>locality, total_sqft, bath, and BHK</strong>.
+                    Estimates market price and confidence ranges tailored to local micro-markets.
+                </p>
+                <a href="{{ url_for('predict', city=current_city.name) }}" class="text-primary fw-semibold text-decoration-none mt-auto">
+                    Try {{ current_city.name }} Predictor <i class="fa-solid fa-arrow-right ms-1"></i>
+                </a>
+            </div>
+        </div>
+
+        <!-- Feature 2: Value Score -->
+        <div class="col-md-4">
+            <div class="card card-glass h-100 p-4 border-0">
+                <div class="rounded-circle bg-info bg-opacity-10 text-info d-inline-flex align-items-center justify-content-center mb-3"
+                     style="width:54px;height:54px;font-size:1.5rem;">
+                    <i class="fa-solid fa-gem"></i>
+                </div>
+                <h4 class="fw-bold text-dark">Value Score Engine</h4>
+                <p class="text-muted">
+                    Calculates Value Score = Predicted Price &divide; Listed Price to
+                    automatically flag <strong>underpriced "Great Deal"</strong>
+                    properties in {{ current_city.name }}.
+                </p>
+                <a href="{{ url_for('recommend', city=current_city.name) }}" class="text-info fw-semibold text-decoration-none mt-auto">
+                    Explore {{ current_city.name }} Deals <i class="fa-solid fa-arrow-right ms-1"></i>
+                </a>
+            </div>
+        </div>
+
+        <!-- Feature 3: Dashboard -->
+        <div class="col-md-4">
+            <div class="card card-glass h-100 p-4 border-0">
+                <div class="rounded-circle bg-success bg-opacity-10 text-success d-inline-flex align-items-center justify-content-center mb-3"
+                     style="width:54px;height:54px;font-size:1.5rem;">
+                    <i class="fa-solid fa-chart-pie"></i>
+                </div>
+                <h4 class="fw-bold text-dark">Analytics Dashboard</h4>
+                <p class="text-muted">
+                    Exploratory visuals: price distribution, top location bar charts,
+                    price vs sqft scatter, and feature correlation heatmap for {{ current_city.name }}.
+                </p>
+                <a href="{{ url_for('dashboard', city=current_city.name) }}" class="text-success fw-semibold text-decoration-none mt-auto">
+                    View {{ current_city.name }} Insights <i class="fa-solid fa-arrow-right ms-1"></i>
+                </a>
+            </div>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

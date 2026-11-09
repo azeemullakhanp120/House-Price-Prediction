@@ -1,0 +1,194 @@
+{% extends 'base.html' %}
+
+{% block title %}Smart House Recommender — {{ current_city.name }}{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+
+    <!-- Page header -->
+    <div class="card card-glass p-4 mb-4 border-0">
+        <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
+            <div class="d-flex align-items-center gap-3">
+                <div class="rounded-circle bg-info text-white p-3 d-flex align-items-center justify-content-center"
+                     style="width:56px;height:56px;font-size:1.5rem;">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i>
+                </div>
+                <div>
+                    <h2 class="fw-bold mb-1">{{ current_city.name }} Smart House Recommender</h2>
+                    <p class="text-muted mb-0">
+                        Filter by budget &amp; BHK preference to discover top-ranked properties
+                        and underpriced market deals across {{ current_city.name }}.
+                    </p>
+                </div>
+            </div>
+            <div class="badge bg-light text-info border px-3 py-2 rounded-pill fs-6">
+                <i class="fa-solid fa-city me-1"></i> Active City: {{ current_city.name }}
+            </div>
+        </div>
+    </div>
+
+    <!-- Filter form -->
+    <div class="card card-glass p-4 mb-4 shadow-sm border-0">
+        <form action="{{ url_for('recommend') }}" method="GET" class="row g-3 align-items-end">
+
+            <!-- City Selector in Filter -->
+            <div class="col-md-2">
+                <label for="filter_city" class="form-label">
+                    <i class="fa-solid fa-city text-primary me-1"></i>
+                    City
+                </label>
+                <select class="form-select" id="filter_city" name="city" onchange="window.location.href='{{ url_for('recommend') }}?city=' + this.value">
+                    {% for c in cities %}
+                        <option value="{{ c.name }}" {% if c.name == active_city_name %}selected{% endif %}>
+                            {{ c.name }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- Locality -->
+            <div class="col-md-3">
+                <label for="location" class="form-label">
+                    <i class="fa-solid fa-location-dot text-danger me-1"></i>
+                    Locality
+                </label>
+                <select class="form-select" id="location" name="location">
+                    <option value="">All {{ current_city.name }} Localities</option>
+                    {% for loc in locations %}
+                        <option value="{{ loc }}" {% if selected_location == loc %}selected{% endif %}>
+                            {{ loc }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- Min Budget -->
+            <div class="col-md-2">
+                <label for="min_budget" class="form-label">Min Budget (₹ L)</label>
+                <input type="number" class="form-control" id="min_budget" name="min_budget"
+                       placeholder="e.g. 40"
+                       value="{{ selected_min_budget or '' }}">
+            </div>
+
+            <!-- Max Budget -->
+            <div class="col-md-2">
+                <label for="max_budget" class="form-label">Max Budget (₹ L)</label>
+                <input type="number" class="form-control" id="max_budget" name="max_budget"
+                       placeholder="e.g. 200"
+                       value="{{ selected_max_budget or '' }}">
+            </div>
+
+            <!-- Min BHK -->
+            <div class="col-md-2">
+                <label for="min_bedrooms" class="form-label">Min BHK</label>
+                <select class="form-select" id="min_bedrooms" name="min_bedrooms">
+                    <option value="">Any BHK</option>
+                    <option value="1" {% if selected_min_bedrooms == 1 %}selected{% endif %}>1+ BHK</option>
+                    <option value="2" {% if selected_min_bedrooms == 2 %}selected{% endif %}>2+ BHK</option>
+                    <option value="3" {% if selected_min_bedrooms == 3 %}selected{% endif %}>3+ BHK</option>
+                    <option value="4" {% if selected_min_bedrooms == 4 %}selected{% endif %}>4+ BHK</option>
+                </select>
+            </div>
+
+            <!-- Filter Buttons -->
+            <div class="col-md-1 d-flex gap-1">
+                <button type="submit" class="btn btn-primary-gradient w-100" title="Apply Filter">
+                    <i class="fa-solid fa-filter"></i>
+                </button>
+                <a href="{{ url_for('recommend', city=current_city.name) }}" class="btn btn-outline-secondary" title="Reset Filters">
+                    <i class="fa-solid fa-rotate"></i>
+                </a>
+            </div>
+
+        </form>
+    </div>
+
+    <!-- Results grid -->
+    <div class="row g-4">
+        {% if recommendations and recommendations|length > 0 %}
+            {% for house in recommendations %}
+            <div class="col-md-4">
+                <div class="card card-glass h-100 shadow-sm border-0 overflow-hidden">
+
+                    <!-- Card header: property ID + value badge -->
+                    <div class="card-header bg-light border-bottom p-3 d-flex align-items-center justify-content-between">
+                        <span class="fw-bold text-dark"><i class="fa-solid fa-building me-1 text-primary"></i> {{ house.property_id }}</span>
+                        <span class="badge {% if 'Great' in house.value_tag %}badge-great-deal{% elif 'Fair' in house.value_tag %}badge-fair-deal{% else %}badge-overpriced{% endif %}">
+                            {{ house.value_tag }}
+                        </span>
+                    </div>
+
+                    <div class="card-body p-4">
+                        <!-- Price + location -->
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <div>
+                                <h3 class="fw-bold text-primary mb-0">₹{{ house.price }} Lakhs</h3>
+                                <p class="text-muted small mb-0">
+                                    <i class="fa-solid fa-location-dot me-1 text-danger"></i>
+                                    {{ house.location }}, {{ current_city.name }}
+                                </p>
+                            </div>
+                        </div>
+
+                        <hr class="my-3 text-muted opacity-25">
+
+                        <!-- Key stats -->
+                        <div class="row text-center g-2 mb-3 text-muted small">
+                            <div class="col-4 border-end">
+                                <strong class="d-block text-dark">{{ house.BHK }} BHK</strong>
+                                <span>Bedrooms</span>
+                            </div>
+                            <div class="col-4 border-end">
+                                <strong class="d-block text-dark">{{ house.bath }}</strong>
+                                <span>Baths</span>
+                            </div>
+                            <div class="col-4">
+                                <strong class="d-block text-dark">{{ house.total_sqft }}</strong>
+                                <span>sqft</span>
+                            </div>
+                        </div>
+
+                        <!-- ML value analysis -->
+                        <div class="p-3 bg-light rounded-3 mb-3 small border">
+                            <div class="d-flex justify-content-between mb-1">
+                                <span class="text-muted">ML Estimated Value:</span>
+                                <strong class="text-success">₹{{ house.predicted_price }} Lakhs</strong>
+                            </div>
+                            <div class="d-flex justify-content-between">
+                                <span class="text-muted">Value Score Ratio:</span>
+                                <strong>{{ house.value_score }}×</strong>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Find Similar button -->
+                    <div class="card-footer bg-transparent border-0 p-3 pt-0 text-center">
+                        <a href="{{ url_for('recommend') }}?city={{ current_city.name }}&property_id={{ house.property_id }}"
+                           class="btn btn-sm btn-outline-primary w-100">
+                            <i class="fa-solid fa-layer-group me-1"></i> Find Similar Deals
+                        </a>
+                    </div>
+
+                </div>
+            </div>
+            {% endfor %}
+
+        {% else %}
+            <!-- Empty-state card -->
+            <div class="col-12 text-center py-5">
+                <div class="p-5 bg-white rounded-4 shadow-sm border">
+                    <i class="fa-solid fa-house-circle-xmark text-muted mb-3" style="font-size:3rem;"></i>
+                    <h4 class="fw-bold">No Matching Properties Found in {{ current_city.name }}</h4>
+                    <p class="text-muted">
+                        Try expanding your price range, choosing another locality, or resetting filters.
+                    </p>
+                    <a href="{{ url_for('recommend', city=current_city.name) }}" class="btn btn-primary-gradient mt-2">
+                        Reset Filters
+                    </a>
+                </div>
+            </div>
+        {% endif %}
+    </div><!-- /results grid -->
+
+</div>
+{% endblock %}

@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+
+{% block title %}Analytics Dashboard — {{ city }}{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+
+    <!-- Page Header -->
+    <div class="card card-glass p-4 mb-4 border-0">
+        <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
+            <div class="d-flex align-items-center gap-3">
+                <div class="rounded-circle bg-success text-white p-3 d-flex align-items-center justify-content-center"
+                     style="width: 56px; height: 56px; font-size: 1.5rem;">
+                    <i class="fa-solid fa-chart-column"></i>
+                </div>
+                <div>
+                    <h2 class="fw-bold mb-1">{{ city }} Real Estate Analytics Dashboard</h2>
+                    <p class="text-muted mb-0">Explore property price distributions, feature correlations, and micro-market statistics for {{ city }}.</p>
+                </div>
+            </div>
+
+            <!-- City Switcher Pills on Dashboard -->
+            <div class="d-flex flex-wrap gap-1">
+                {% for c in cities %}
+                <a href="{{ url_for('dashboard', city=c.name) }}"
+                   class="btn btn-sm {% if c.name == city %}btn-success text-white fw-bold shadow-sm{% else %}btn-outline-secondary bg-white{% endif %} rounded-pill px-3 py-1">
+                    <i class="fa-solid fa-chart-line me-1"></i> {{ c.name }}
+                </a>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <!-- EDA Visualisation Charts -->
+    <div class="row g-4 mb-4">
+
+        <div class="col-md-6">
+            <div class="card card-glass p-3 border-0 h-100 shadow-sm">
+                <h5 class="fw-bold text-dark mb-3"><i class="fa-solid fa-chart-line text-primary me-2"></i>Price Distribution — {{ city }}</h5>
+                <img src="{{ url_for('static', filename='images/price_dist_' + city_id + '.png') }}" class="img-fluid rounded-3 border" alt="Price Distribution">
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card card-glass p-3 border-0 h-100 shadow-sm">
+                <h5 class="fw-bold text-dark mb-3"><i class="fa-solid fa-map-location-dot text-info me-2"></i>Average Price by Locality — {{ city }}</h5>
+                <img src="{{ url_for('static', filename='images/price_by_location_' + city_id + '.png') }}" class="img-fluid rounded-3 border" alt="Price by Location">
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card card-glass p-3 border-0 h-100 shadow-sm">
+                <h5 class="fw-bold text-dark mb-3"><i class="fa-solid fa-vector-square text-success me-2"></i>Price vs Built-up Area — {{ city }}</h5>
+                <img src="{{ url_for('static', filename='images/price_vs_area_' + city_id + '.png') }}" class="img-fluid rounded-3 border" alt="Price vs Area">
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card card-glass p-3 border-0 h-100 shadow-sm">
+                <h5 class="fw-bold text-dark mb-3"><i class="fa-solid fa-table-cells text-warning me-2"></i>Feature Correlation Matrix — {{ city }}</h5>
+                <img src="{{ url_for('static', filename='images/corr_heatmap_' + city_id + '.png') }}" class="img-fluid rounded-3 border" alt="Correlation Matrix">
+            </div>
+        </div>
+
+    </div>
+
+</div>
+{% endblock %}
